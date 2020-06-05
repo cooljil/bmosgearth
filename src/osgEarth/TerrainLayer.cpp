@@ -421,6 +421,31 @@ TerrainLayer::establishCacheSettings()
 CacheSettings*
 TerrainLayer::getCacheSettings() const
 {
+    if (!_cacheSettings.valid())
+    {
+        Threading::ScopedMutexLock lock(_mutex);
+        if (!_cacheSettings.valid())
+        {
+            // clone the existing one if it exists:
+            CacheSettings* oldSettings = CacheSettings::get(_readOptions.get());
+            _cacheSettings = oldSettings ? new CacheSettings(*oldSettings) : new CacheSettings();
+
+            _cacheSettings->store(_readOptions.get());
+
+            _cacheSettings->integrateCachePolicy(options().cachePolicy());
+
+            // if all it well, open and activate a caching bin for this layer.
+            if (_cacheSettings->isCacheEnabled() && _cacheSettings->getCacheBin() == 0L)
+            {
+                CacheBin* bin = _cacheSettings->getCache()->addBin(_runtimeCacheId);
+                if (bin)
+                {
+                    _cacheSettings->setCacheBin(bin);
+                    OE_INFO << LC << "Cache bin is [" << bin->getID() << "]\n";
+                }
+            }
+        }
+    }
     return _cacheSettings.get();
 }
 
@@ -1034,7 +1059,7 @@ TerrainLayer::setReadOptions(const osgDB::Options* readOptions)
     URIContext( options().referrer() ).store( _readOptions.get() );
 
     Threading::ScopedMutexLock lock(_mutex);
-    _cacheSettings = new CacheSettings();
+    _cacheSettings = nullptr;//new CacheSettings();
     _cacheBinMetadata.clear();
 }
 

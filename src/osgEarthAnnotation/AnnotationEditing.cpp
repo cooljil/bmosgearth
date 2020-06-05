@@ -67,6 +67,15 @@ _node( node )
     updateDraggers();
 }
 
+GeoPositionNodeEditor::GeoPositionNodeEditor(GeoPositionNode *node, Dragger *dragger) :
+    _node(node)
+{
+    _dragger  = dragger;
+    _dragger->addPositionChangedCallback(new DraggerCallback(_node.get(), this) );
+    addChild(_dragger);
+    updateDraggers();
+}
+
 GeoPositionNodeEditor::~GeoPositionNodeEditor()
 {    
 }

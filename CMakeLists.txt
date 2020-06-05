@@ -40,8 +40,41 @@ IF(MINGW)
     SET(OSGEARTH_PLUGIN_PREFIX "mingw_")
 ENDIF()
 
-
 SET(OSGEARTH_VERSION ${OSGEARTH_MAJOR_VERSION}.${OSGEARTH_MINOR_VERSION}.${OSGEARTH_PATCH_VERSION})
+
+#-----------------wy config--------------------------
+set(ANDROID_3RDPARTY_DIR "E:/QTCreatorProject/3rdparty")
+#set(OSGEARTH_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+#set(OSGEARTH_BINARY_DIR ${CMAKE_BINARY_DIR})
+
+string(REPLACE "OSGEarth" "OSG" OSG_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+string(REPLACE "OSGEarth" "OSG" OSG_BINARY_DIR ${CMAKE_BINARY_DIR})
+
+message(-------${OSG_BINARY_DIR})
+
+SET(OSG_DIR "${OSG_SOURCE_DIR}")
+SET(OSG_BUILD_DIR "${OSG_BINARY_DIR}")
+
+SET(CURL_INCLUDE_DIR ${ANDROID_3RDPARTY_DIR}/curl/include)
+SET(CURL_LIBRARY ${ANDROID_3RDPARTY_DIR}/build-lib/${CMAKE_BUILD_TYPE}/libcurl.a)
+
+SET(GDAL_INCLUDE_DIR ${ANDROID_3RDPARTY_DIR}/gdal)
+SET(GDAL_LIBRARY ${ANDROID_3RDPARTY_DIR}/build-lib/${CMAKE_BUILD_TYPE}/libgdal.so)
+
+SET(GEOS_INCLUDE_DIR ${ANDROID_3RDPARTY_DIR}/geos/include)
+SET(GEOS_LIBRARY ${ANDROID_3RDPARTY_DIR}/build-lib/${CMAKE_BUILD_TYPE}/libgeos.a)
+
+SET(ROCKSDB_INCLUDE_DIR ${ANDROID_3RDPARTY_DIR}/rocksdb/include)
+SET(ROCKSDB_LIBRARY ${ANDROID_3RDPARTY_DIR}/build-lib/${CMAKE_BUILD_TYPE}/librocksdb.a)
+
+
+IF(ANDROID)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frtti -fexceptions")
+    message(OSGEARTH_ANDROID CONFIG---------${CMAKE_CXX_FLAGS})
+ENDIF()
+
+#----------------------------------------------------
+
 
 
 # We want to build SONAMES shared librariess
@@ -54,8 +87,8 @@ SET(OpenThreads_SOURCE_DIR ${OSGEARTH_SOURCE_DIR})
 SET(THIRD_PARTY_DIR "" CACHE PATH "OSG 3rd-party dependency folder")
 
 IF(THIRD_PARTY_DIR)
-    LIST(APPEND CMAKE_INCLUDE_PATH ${THIRD_PARTY_DIR}/include)
-    LIST(APPEND CMAKE_LIBRARY_PATH ${THIRD_PARTY_DIR}/lib)
+    LIST(APPEND CMAKE_INCLUDE_PATH ${THIRD_PARTY_DIR})
+    LIST(APPEND CMAKE_LIBRARY_PATH ${THIRD_PARTY_DIR}/build-lib)
     MESSAGE(STATUS "CMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}")
 ENDIF(THIRD_PARTY_DIR)
 
@@ -71,7 +104,8 @@ IF (OSGEARTH_EMBED_GIT_SHA)
 ENDIF (OSGEARTH_EMBED_GIT_SHA)
 
 #
-SET(OSGEARTH_USE_GLES FALSE)
+#SET(OSGEARTH_USE_GLES FALSE)
+SET(OSGEARTH_USE_GLES TRUE)
 
 # check for iOS build
 OPTION(OSGEARTH_BUILD_PLATFORM_IPHONE "Enable IPhoneSDK Device support" OFF)
@@ -324,11 +358,11 @@ ENDIF(INSTALL_TO_OSG_DIR)
 
 
 # osgEarth Examples
-OPTION(BUILD_OSGEARTH_EXAMPLES "Enable to build osgEarth Examples" ON)
+OPTION(BUILD_OSGEARTH_EXAMPLES "Enable to build osgEarth Examples" OFF)
 
 # Applications and tests
-OPTION(BUILD_APPLICATIONS "Enable build of Applications" ON)
-OPTION(BUILD_TESTS "Enable build of Tests" ON)
+OPTION(BUILD_APPLICATIONS "Enable build of Applications" OFF)
+OPTION(BUILD_TESTS "Enable build of Tests" OFF)
 
 # OE Core
 ADD_SUBDIRECTORY(src)
@@ -386,14 +420,14 @@ CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/cmake_uninstall.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
-ADD_CUSTOM_TARGET(uninstall
+ADD_CUSTOM_TARGET(uninstallOSGEarth
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 
 
 #------------------------------------------------------------------------------
 # Docs.
-add_subdirectory(docs)
+#add_subdirectory(docs)
 
 
 

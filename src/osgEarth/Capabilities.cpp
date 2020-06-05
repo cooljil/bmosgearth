@@ -244,7 +244,7 @@ _isCoreProfile          ( true )
         OE_INFO << LC << "  Max GPU attributes = " << _maxGPUAttribs << std::endl;
 
 #if !(defined(OSG_GL3_AVAILABLE))
-        glGetIntegerv( GL_DEPTH_BITS, &_depthBits );
+        _depthBits = 0;        //glGetIntegerv( GL_DEPTH_BITS, &_depthBits );//要报错
         OE_INFO << LC << "  Depth buffer bits = " << _depthBits << std::endl;
 #endif
         

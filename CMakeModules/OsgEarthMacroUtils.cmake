@@ -398,6 +398,7 @@ MACRO(SETUP_EXE IS_COMMANDLINE_APP)
 
     SETUP_LINK_LIBRARIES()
 
+
 ENDMACRO(SETUP_EXE)
 
 # Taked optional second arg: APPLICATION_FOLDER
@@ -484,7 +485,7 @@ macro(configure_shaders templateFile autoGenCppFile)
 	
 	# generate the build-time script that will create out cpp file with inline shaders:
 	configure_file(
-		"${CMAKE_SOURCE_DIR}/CMakeModules/ConfigureShaders.cmake.in"
+                "${CMAKE_SOURCE_DIR}/CMakeModules/ConfigureShaders.cmake.in"
 		"${CMAKE_CURRENT_BINARY_DIR}/ConfigureShaders.cmake"
 		@ONLY)
 	
@@ -497,7 +498,7 @@ macro(configure_shaders templateFile autoGenCppFile)
 		DEPENDS
 			${GLSL_FILES}
 			"${TEMPLATE_FILE}"
-			"${CMAKE_SOURCE_DIR}/CMakeModules/ConfigureShaders.cmake.in" )
+                        "${CMAKE_SOURCE_DIR}/CMakeModules/ConfigureShaders.cmake.in" )
 	
 endmacro(configure_shaders)
 

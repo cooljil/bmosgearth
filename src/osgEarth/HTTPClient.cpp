@@ -1415,6 +1415,11 @@ namespace
             std::string mimeType = response.getMimeType();
             if ( !mimeType.empty() )
             {
+                size_t ti = mimeType.find(";");
+                if(ti > 0)
+                {
+                    mimeType = mimeType.substr(0,ti);
+                }
                 reader = osgDB::Registry::instance()->getReaderWriterForMimeType(mimeType);
             }
         }

@@ -156,7 +156,7 @@ TileDrawable::setElevationRaster(const osg::Image*   image,
 
     else
     {
-        for (int i = 0; i < _tileSize*_tileSize; ++i)
+        for (int i = 0,ic = _tileSize*_tileSize; i < ic; ++i)
         {
             _mesh[i] = verts[i];
         }
@@ -185,7 +185,7 @@ TileDrawable::computeBoundingBox() const
     osg::BoundingBox box;
 
     // core bbox created from the mesh:
-    for(unsigned i=0; i<_tileSize*_tileSize; ++i)
+    for(unsigned i=0,ic = _tileSize*_tileSize; i < ic; ++i)
     {
         box.expandBy(_mesh[i]);
     }

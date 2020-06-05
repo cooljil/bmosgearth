@@ -146,6 +146,16 @@ _size( 5.0f )
     init();
 }
 
+FeatureEditor::FeatureEditor(FeatureNode *featureNode, bool isInit):
+    _featureNode( featureNode ),
+    _color(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+    _pickColor(osg::Vec4(1.0f, 1.0f, 0.0f, 1.0f)),
+    _size( 5.0f )
+{
+    if(isInit)
+        init();
+}
+
 
 const osg::Vec4f&
 FeatureEditor::getPickColor() const

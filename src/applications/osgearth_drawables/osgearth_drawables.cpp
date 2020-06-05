@@ -249,7 +249,6 @@ main(int argc, char** argv)
     // Sets up the State for GL3 mode
     viewer.setRealizeOperation(new GL3RealizeOperation());
 #endif
-
     if (arguments.read("--ortho"))
     {
         viewer.realize();

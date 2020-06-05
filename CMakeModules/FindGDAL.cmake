@@ -19,7 +19,7 @@
 # This makes the presumption that you are include gdal.h like
 # #include "gdal.h"
 
-SET(GDAL_DIR "" CACHE PATH "Root folder of GDAL dependency")
+#SET(GDAL_DIR "" CACHE PATH "Root folder of GDAL dependency")
 
 FIND_PATH(GDAL_INCLUDE_DIR gdal.h
   PATHS
@@ -40,8 +40,8 @@ FIND_PATH(GDAL_INCLUDE_DIR gdal.h
     /usr/include/gdal
     /usr/include/GDAL
     /usr/include
-    /sw/include/gdal 
-    /sw/include/GDAL 
+    /sw/include/gdal
+    /sw/include/GDAL
     /sw/include # Fink
     /opt/local/include/gdal
     /opt/local/include/GDAL
@@ -55,20 +55,20 @@ FIND_PATH(GDAL_INCLUDE_DIR gdal.h
     c:/Program Files/FWTools2.1.0/include
 )
 
-FIND_LIBRARY(GDAL_LIBRARY 
+FIND_LIBRARY(GDAL_LIBRARY
   NAMES
-    gdal gdal_i gdal1.8.0 gdal1.7.0 gdal1.6.0 gdal1.5.0 gdal1.4.0 gdal1.3.2 GDAL 
+    gdal gdal_i gdal1.8.0 gdal1.7.0 gdal1.6.0 gdal1.5.0 gdal1.4.0 gdal1.3.2 GDAL
   PATHS
-    c:/Program Files/FWTools2.1.0/lib 
+    c:/Program Files/FWTools2.1.0/lib
     ${GDAL_DIR}/lib
     $ENV{GDAL_DIR}
   NO_DEFAULT_PATH
   PATH_SUFFIXES lib64 lib
 )
 
-FIND_LIBRARY(GDAL_LIBRARY 
+FIND_LIBRARY(GDAL_LIBRARY
   NAMES
-    gdal gdal_i gdal1.8.0 gdal1.7.0 gdal1.6.0 gdal1.5.0 gdal1.4.0 gdal1.3.2 GDAL 
+    gdal gdal_i gdal1.8.0 gdal1.7.0 gdal1.6.0 gdal1.5.0 gdal1.4.0 gdal1.3.2 GDAL
   PATHS
     ${GDAL_DIR}/lib
     ~/Library/Frameworks
@@ -87,7 +87,10 @@ FIND_LIBRARY(GDAL_LIBRARY
 SET(GDAL_FOUND "NO")
 IF(GDAL_LIBRARY AND GDAL_INCLUDE_DIR)
   SET(GDAL_FOUND "YES")
+
 ENDIF(GDAL_LIBRARY AND GDAL_INCLUDE_DIR)
+
+message(++++++++GDAL_FOUND:${GDAL_FOUND})
 
 
 

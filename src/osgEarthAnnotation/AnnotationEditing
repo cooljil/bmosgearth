@@ -52,7 +52,10 @@ namespace osgEarth { namespace Annotation
          * @param localizedNode
          *        The LocalizedNode to edit
          */
-        GeoPositionNodeEditor(GeoPositionNode* localizedNode);    
+        GeoPositionNodeEditor(GeoPositionNode* localizedNode);
+
+
+        GeoPositionNodeEditor(GeoPositionNode* localizedNode,Dragger * dragger);
         
         virtual ~GeoPositionNodeEditor();    
 

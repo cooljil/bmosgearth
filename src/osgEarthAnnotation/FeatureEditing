@@ -86,6 +86,8 @@ namespace osgEarth { namespace Annotation
          */
         FeatureEditor( FeatureNode* featureNode );
 
+        FeatureEditor( FeatureNode* featureNode ,bool isInit);
+
         /**
          *Gets the color of the draggers when they are selected
          */
