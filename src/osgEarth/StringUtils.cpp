@@ -188,9 +188,12 @@ osgEarth::hashString( const std::string& input )
     const char* data = input.c_str();
     unsigned int h = m ^ len; // using "m" as the seed.
 
+    size_t ksize = sizeof(unsigned int);
     while(len >= 4)
     {
-        unsigned int k = *(unsigned int *)data;
+//        unsigned int k = *(unsigned int *)data;
+        unsigned int k;
+        memcpy(&k,data,ksize);
         k *= m;
         k ^= k >> r;
         k *= m;
