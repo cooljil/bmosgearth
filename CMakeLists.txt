@@ -91,12 +91,12 @@ ELSEIF(APPLE)
     SET(OSG_BUILD_PLATFORM_IPHONE TRUE)
     SET(OSGEARTH_BUILD_PLATFORM_IPHONE TRUE)
 
-    IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-        string(REPLACE "-g" "-O2 -DNDEBUG" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-        string(REPLACE "-g" "-O2 -DNDEBUG" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frtti -fexceptions ")
-        message(OSGEARTH_IOS CONFIG---------${CMAKE_CXX_FLAGS})
-    ENDIF()    
+#    IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+#        string(REPLACE "-g" "-O2 -DNDEBUG" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+#        string(REPLACE "-g" "-O2 -DNDEBUG" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frtti -fexceptions ")
+#        message(OSGEARTH_IOS CONFIG---------${CMAKE_CXX_FLAGS})
+#    ENDIF()
 ENDIF()
 
 #----------------------------------------------------
