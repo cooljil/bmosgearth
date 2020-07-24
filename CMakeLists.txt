@@ -141,8 +141,8 @@ IF(OSGEARTH_BUILD_PLATFORM_IPHONE)
     SET(OSGEARTH_USE_GLES TRUE)
 
     # set sdk and min versions
-    SET (IPHONE_SDKVER "10.2" CACHE STRING "IOS SDK-Version")
-    SET (IPHONE_VERSION_MIN "7.0" CACHE STRING "IOS minimum os version, use 7.0 or greater to get 64bit support")
+    SET (IPHONE_SDKVER "13.6" CACHE STRING "IOS SDK-Version")
+    SET (IPHONE_VERSION_MIN "11.0" CACHE STRING "IOS minimum os version, use 7.0 or greater to get 64bit support")
 
     # get full path to sdk from requested versions
     SET (IPHONE_DEVROOT "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer")
