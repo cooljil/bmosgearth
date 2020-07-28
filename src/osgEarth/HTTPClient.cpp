@@ -693,6 +693,22 @@ HTTPClient::get( const std::string&    url,
     return getClient().doGet( url, options, progress);
 }
 
+HTTPResponse HTTPClient::post( const HTTPRequest&    request,
+                         HTTPostData *         httpPostData,
+                         const osgDB::Options* options,
+                         ProgressCallback*     progress)
+{
+    return getClient().perform( request, httpPostData,options, progress);
+}
+
+HTTPResponse HTTPClient::post( const std::string&    url,
+                         HTTPostData *         httpPostData,
+                         const osgDB::Options* options,
+                         ProgressCallback*     progress)
+{
+    return getClient().perform( url, httpPostData,options, progress);
+}
+
 ReadResult
 HTTPClient::readImage(const HTTPRequest&    request,
                       const osgDB::Options* options,
@@ -984,6 +1000,15 @@ HTTPClient::doGet(const HTTPRequest&    request,
                   const osgDB::Options* options,
                   ProgressCallback*     progress) const
 {
+    return perform(request,nullptr,options,progress);
+}
+
+HTTPResponse
+HTTPClient::perform(const HTTPRequest&    request,
+                  HTTPostData *         httpPostData,
+                  const osgDB::Options* options,
+                  ProgressCallback*     progress) const
+{
     METRIC_BEGIN("HTTPClient::doGet", 1,
                    "url", request.getURL().c_str());
 
@@ -1149,6 +1174,21 @@ HTTPClient::doGet(const HTTPRequest&    request,
         }
     }
 
+    //wy added 2020-7-27
+    if(httpPostData)
+    {
+        if(httpPostData->P_IsForm)
+        {
+            headers = curl_slist_append(headers, "content-type: application/x-www-form-urlencoded");
+        }
+        curl_easy_setopt(_curl_handle, CURLOPT_POSTFIELDS, httpPostData->P_Data);
+        curl_easy_setopt(_curl_handle, CURLOPT_POSTFIELDSIZE, httpPostData->P_Size);
+    }
+    else
+    {
+        curl_easy_setopt(_curl_handle, CURLOPT_HTTPGET, 1);
+    }
+
     // Disable the default Pragma: no-cache that curl adds by default.
     headers = curl_slist_append(headers, "Pragma: ");
     curl_easy_setopt(_curl_handle, CURLOPT_HTTPHEADER, headers);
@@ -1163,6 +1203,8 @@ HTTPClient::doGet(const HTTPRequest&    request,
     {
         curl_easy_setopt(_curl_handle, CURLOPT_PROGRESSDATA, progress);
     }
+
+
 
     CURLcode res;
     long response_code = 0L;

@@ -77,6 +77,31 @@ namespace osgEarth
 {
     typedef std::map<std::string,std::string> Headers;
 
+/**
+     * @brief The HTTPostData struct
+     * 支持POST请求
+     *  wy added on 2020-7-24
+*/
+    struct OSGEARTH_EXPORT HTTPostData
+    {
+    public:
+        HTTPostData()
+        {
+            P_Data = nullptr;
+            P_Size = 0;
+            P_IsForm = false;
+        }
+        HTTPostData(void * d,size_t size,bool isForm = false)
+        {
+            P_Data = d;
+            P_Size = size;
+            P_IsForm = isForm;
+        }
+        bool P_IsForm;//是否表单
+        void * P_Data;
+        size_t P_Size;
+    };
+
 
     /**
      * An HTTP request for use with the HTTPClient class.
@@ -373,6 +398,16 @@ namespace osgEarth
                                  const osgDB::Options* options  =0L,
                                  ProgressCallback*     progress =0L );
 
+        static HTTPResponse post( const HTTPRequest&    request,
+                                 HTTPostData *         httpPostData,
+                                 const osgDB::Options* dbOptions =0L,
+                                 ProgressCallback*     progress  =0L );
+
+        static HTTPResponse post( const std::string&    url,
+                                 HTTPostData *         httpPostData,
+                                 const osgDB::Options* options  =0L,
+                                 ProgressCallback*     progress =0L );
+
     public:
         HTTPClient();
         virtual ~HTTPClient();
@@ -382,6 +417,11 @@ namespace osgEarth
         void readOptions( const osgDB::ReaderWriter::Options* options, std::string &proxy_host, std::string &proxy_port ) const;
 
         HTTPResponse doGet( const HTTPRequest&    request,
+                            const osgDB::Options* options  =0L,
+                            ProgressCallback*     callback =0L ) const;
+
+        HTTPResponse perform( const HTTPRequest&    request,
+                            HTTPostData *         httpPostData,
                             const osgDB::Options* options  =0L,
                             ProgressCallback*     callback =0L ) const;
         
