@@ -66,6 +66,15 @@ namespace osgEarth { namespace Annotation
             const Linear&     height,
             const Style&      style );
 
+        RectangleNode(
+                const GeoPoint&   upperLeft,
+                const GeoPoint&   lowerRight,
+                const Style&      style );
+
+        void update(const GeoPoint&   upperLeft,
+                    const GeoPoint&   lowerRight,
+                    const Style&      style);
+
         /**
          * Gets the width of this rectangle
          */

@@ -61,6 +61,30 @@ GeoPositionNode()
     compile();
 }
 
+RectangleNode::RectangleNode(const GeoPoint &upperLeft, const GeoPoint &lowerRight, const Style &style)
+{
+    update(upperLeft,lowerRight,style);
+}
+
+void RectangleNode::update(const GeoPoint &upperLeft, const GeoPoint &lowerRight, const Style &style)
+{
+    osg::Vec3d center = (upperLeft.vec3d() + lowerRight.vec3d()) / 2;
+    center.z() = 0;
+    GeoPoint geoCenter(upperLeft.getSRS(),center,upperLeft.altitudeMode());
+    double left = osg::DegreesToRadians(upperLeft.x());
+    double right = osg::DegreesToRadians(lowerRight.x());
+    double top = osg::DegreesToRadians(upperLeft.y());
+    double bottom = osg::DegreesToRadians(lowerRight.y());
+    Linear width(GeoMath::distance(top,left,top,right));
+    Linear height(GeoMath::distance(top,left,bottom,left));
+
+    _width = width;
+    _height = height;
+    _style = style;
+    setPosition(geoCenter);
+    compile();
+}
+
 void
 RectangleNode::construct()
 {
