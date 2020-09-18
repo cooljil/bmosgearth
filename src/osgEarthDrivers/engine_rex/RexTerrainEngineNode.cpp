@@ -649,7 +649,10 @@ RexTerrainEngineNode::traverse(osg::NodeVisitor& nv)
 #endif
 
         // Assemble the terrain drawables:
+        BmCurrentMaxLodMutex.lock();
+        BmCurrentMaxLod = 0;
         _terrain->accept(culler);
+        BmCurrentMaxLodMutex.unlock();
 
         // If we're using geometry pooling, optimize the drawable for shared state
         // by sorting the draw commands.

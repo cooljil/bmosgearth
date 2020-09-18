@@ -103,6 +103,11 @@ SingleKeyNodeFactory::createTile(TileModel*        model,
 #else
     // compile the model into a node:
     osg::ref_ptr<TileNode> tileNode = _modelCompiler->compile(model, _frame, progress);
+    TerrainEngineNode * engineNode = dynamic_cast<TerrainEngineNode *>(_engine);
+    if(tileNode.valid() && engineNode && engineNode->getBmTileNodeCallback())
+    {
+        engineNode->getBmTileNodeCallback()->tileNodeCreated(tileNode,tileNode->getKey());
+    }
 #endif
 
     // see if this tile might have children.

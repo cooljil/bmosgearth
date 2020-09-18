@@ -132,6 +132,16 @@ _debug    ( false )
 
 TilePagedLOD::~TilePagedLOD()
 {
+    TileNode * tileNode = getTileNode();
+    if(tileNode)
+    {
+        osg::ref_ptr<MPTerrainEngineNode> engine;
+        MPTerrainEngineNode::getEngineByUID( _engineUID, engine );
+        if (engine.valid() && engine->getBmTileNodeCallback())
+        {
+            engine->getBmTileNodeCallback()->tileNodeDestroying(tileNode,tileNode->getKey());
+        }
+    }
     // need this here b/c it's possible for addChild() to get called from
     // a pager dispatch even after the PLOD in question has been "expired"
     // so we still need to process the live/dead list.
@@ -290,6 +300,7 @@ TilePagedLOD::traverse(osg::NodeVisitor& nv)
 
             int lastChildTraversed = -1;
             bool needToLoadChild = false;
+
             for(unsigned int i=0;i<_rangeList.size();++i)
             {
                 if (_rangeList[i].first<=required_range && required_range<_rangeList[i].second)
@@ -301,7 +312,15 @@ TilePagedLOD::traverse(osg::NodeVisitor& nv)
                             _perRangeDataList[i]._timeStamp=timeStamp;
                             _perRangeDataList[i]._frameNumber=frameNumber;
                         }
-
+                        if ( nv.getVisitorType()==osg::NodeVisitor::CULL_VISITOR)
+                        {
+                            TileNode * tileNode = getTileNode();
+                            if(tileNode)
+                            {
+                                if(tileNode->getKey().getLOD() > engine->BmCurrentMaxLod)
+                                    engine->BmCurrentMaxLod = tileNode->getKey().getLOD();
+                            }
+                        }
                         _children[i]->accept(nv);
                         lastChildTraversed = (int)i;
                     }

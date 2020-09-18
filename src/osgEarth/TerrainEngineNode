@@ -112,7 +112,6 @@ namespace osgEarth
         virtual float operator()(osg::Node* node, osg::NodeVisitor& nv) = 0;
     };
 
-
     /**
      * TerrainEngineNode is the base class and interface for map engine implementations.
      *
@@ -190,6 +189,21 @@ namespace osgEarth
         void addModifyTileBoundingBoxCallback(ModifyTileBoundingBoxCallback* callback);
         void removeModifyTileBoundingBoxCallback(ModifyTileBoundingBoxCallback* callback);
 
+    public:
+        class OSGEARTH_EXPORT BmTileNodeCallback : public osg::Referenced
+        {
+        public:
+            virtual void tileNodeCreated(osg::Node *  ,const TileKey&  ){}
+
+            virtual void tileNodeDestroying(osg::Node *  ,const TileKey& ) {}
+        };
+
+        inline void setBmTileNodeCallback(BmTileNodeCallback* callback) { _bmTileNodeCallback = callback; }
+
+        inline BmTileNodeCallback * getBmTileNodeCallback() { return _bmTileNodeCallback.get(); }
+
+        int  BmCurrentMaxLod;
+        OpenThreads::Mutex BmCurrentMaxLodMutex;
     public: // TerrainEngine
 
         TerrainTileModel* createTileModel(
@@ -355,6 +369,8 @@ namespace osgEarth
         osg::ref_ptr<TerrainTileModelFactory> _tileModelFactory;
 
         osg::ref_ptr<ComputeRangeCallback> _computeRangeCallback;
+
+        osg::ref_ptr<BmTileNodeCallback> _bmTileNodeCallback;
 
     public:
 

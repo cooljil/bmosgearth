@@ -83,6 +83,16 @@ _imageUpdatesActive(false)
     //nop
 }
 
+TileNode::~TileNode()
+{
+    if(_context)
+    {
+        TerrainEngineNode * engineNode = _context->getEngine();
+        if(engineNode->getBmTileNodeCallback())
+            engineNode->getBmTileNodeCallback()->tileNodeDestroying(this,_key);
+    }
+}
+
 void
 TileNode::create(const TileKey& key, TileNode* parent, EngineContext* context)
 {
@@ -92,6 +102,10 @@ TileNode::create(const TileKey& key, TileNode* parent, EngineContext* context)
     _context = context;
 
     _key = key;
+
+    TerrainEngineNode * engineNode = _context->getEngine();
+    if(engineNode->getBmTileNodeCallback())
+        engineNode->getBmTileNodeCallback()->tileNodeCreated(this,_key);
 
     osg::ref_ptr<const Map> map = _context->getMap();
     if (!map.valid())
@@ -565,6 +579,8 @@ TileNode::traverse(osg::NodeVisitor& nv)
         if (_empty == false)
         {
             TerrainCuller* culler = dynamic_cast<TerrainCuller*>(&nv);
+            if(_key.getLOD() > _context->_terrainEngine->BmCurrentMaxLod)
+                _context->_terrainEngine->BmCurrentMaxLod = _key.getLOD();
         
             if (culler->_isSpy)
             {

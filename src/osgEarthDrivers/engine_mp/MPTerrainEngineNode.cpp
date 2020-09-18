@@ -593,6 +593,11 @@ MPTerrainEngineNode::traverse(osg::NodeVisitor& nv)
         {
             _liveTiles->setTraversalFrame( nv.getFrameStamp()->getFrameNumber() );
         }
+        BmCurrentMaxLodMutex.lock();
+        BmCurrentMaxLod = 0;
+        TerrainEngineNode::traverse( nv );
+        BmCurrentMaxLodMutex.unlock();
+        return;
     }
 
 #if 0

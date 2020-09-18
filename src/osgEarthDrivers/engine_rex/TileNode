@@ -57,6 +57,8 @@ namespace osgEarth { namespace Drivers { namespace RexTerrainEngine
     public:
         TileNode();
 
+        ~TileNode();
+
         /** TileKey of the key representing the data in this node. */
         const TileKey& getKey() const { return _key; }
 
