@@ -446,7 +446,9 @@ TerrainTileModelFactory::createElevationTexture(osg::Image* image) const
 {
     osg::Texture2D* tex = new osg::Texture2D( image );
     tex->setInternalFormat(GL_R32F);
-    tex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::LINEAR );
+    //华为等手机的GPU在顶点着色器中不支持LINEAR方式的纹理采样，故改为NEAREST 2020-9-28 by WY modified。
+//    tex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::LINEAR );
+    tex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
     tex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
     tex->setWrap  ( osg::Texture::WRAP_S,     osg::Texture::CLAMP_TO_EDGE );
     tex->setWrap  ( osg::Texture::WRAP_T,     osg::Texture::CLAMP_TO_EDGE );

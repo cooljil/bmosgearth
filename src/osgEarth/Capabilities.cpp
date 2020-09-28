@@ -233,6 +233,12 @@ _isCoreProfile          ( true )
         glGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &_maxGPUTextureUnits );
         OE_INFO << LC << "  Max GPU texture units = " << _maxGPUTextureUnits << std::endl;
 
+        int m_maxVertexTextureImageUnits;
+        glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &m_maxVertexTextureImageUnits);
+
+        int m_maxCombinedTextureImageUnits;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &m_maxCombinedTextureImageUnits);
+
 #if !defined(OSG_GLES2_AVAILABLE) && !defined(OSG_GLES3_AVAILABLE)
         glGetIntegerv( GL_MAX_TEXTURE_COORDS_ARB, &_maxGPUTextureCoordSets );
 #else
