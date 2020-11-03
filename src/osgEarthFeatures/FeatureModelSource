@@ -130,6 +130,10 @@ namespace osgEarth { namespace Features
         osg::ref_ptr<FeatureSource>& featureSource() { return _featureSource; }
         const osg::ref_ptr<FeatureSource>& featureSource() const { return _featureSource; }
 
+        osg::ref_ptr<osg::Callback>& featureTileUpdateCallback() { return _featureTileUpdateCallback; }
+        const osg::ref_ptr<osg::Callback>& featureTileUpdateCallback() const { return _featureTileUpdateCallback; }
+
+
     public:
         FeatureModelSourceOptions( const ConfigOptions& rhs =ConfigOptions() );
 
@@ -148,6 +152,7 @@ namespace osgEarth { namespace Features
 
         optional<FeatureSourceOptions> _featureOptions;
         osg::ref_ptr<FeatureSource>    _featureSource;
+        osg::ref_ptr<osg::Callback>    _featureTileUpdateCallback;
     };
 
 

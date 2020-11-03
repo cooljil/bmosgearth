@@ -68,16 +68,29 @@ namespace osgEarth { namespace Features
         const osgEarth::Profile* getProfile() const;
         void setProfile( const osgEarth::Profile* profile );
 
+        inline bool getInvertedTileY() const {return _invertedTileY;}
+        inline void setInvertedTileY(bool invertedTileY) {_invertedTileY = invertedTileY;}
+
         /** Interpolation method for geodetic data */
         optional<GeoInterpolation>& geoInterp() { return _geoInterp; }
         const optional<GeoInterpolation>& geoInterp() const { return _geoInterp; }
 
+        bool isGlobalGeodeticForWy() const {return _globalGeodeticForWy;}
+        void setGlobalGeodeticForWy(bool isGlobalGeodetic) {_globalGeodeticForWy = isGlobalGeodetic;}
+
+        void setValidExtent(const GeoExtent & validExtent);
+        void getValidExtent(bool &isSetValidExtent,GeoExtent & validExtent);
+
     protected:
         osg::ref_ptr< const osgEarth::Profile > _profile;
         GeoExtent _extent;
+        GeoExtent _validExtent;
+        bool      _isSetValidExtent;
+        bool _globalGeodeticForWy;
         bool _tiled;
         int _firstLevel;
         int _maxLevel;
+        bool _invertedTileY;
         optional<GeoInterpolation> _geoInterp;
     };
 

@@ -128,6 +128,8 @@ GeometryCompilerOptions::fromConfig( const Config& conf )
     conf.get( "shader_policy", "disable",  _shaderPolicy, SHADERPOLICY_DISABLE );
     conf.get( "shader_policy", "inherit",  _shaderPolicy, SHADERPOLICY_INHERIT );
     conf.get( "shader_policy", "generate", _shaderPolicy, SHADERPOLICY_GENERATE );
+    _drawableCallback = conf.getNonSerializable<osg::Callback>("drawable_callback");
+    _resultGroupUpdateCallback = conf.getNonSerializable<osg::Callback>("result_callback");
 }
 
 Config
@@ -153,11 +155,36 @@ GeometryCompilerOptions::getConfig() const
     conf.set( "shader_policy", "disable",  _shaderPolicy, SHADERPOLICY_DISABLE );
     conf.set( "shader_policy", "inherit",  _shaderPolicy, SHADERPOLICY_INHERIT );
     conf.set( "shader_policy", "generate", _shaderPolicy, SHADERPOLICY_GENERATE );
+    if(_drawableCallback.valid())
+        conf.setNonSerializable("drawable_callback",_drawableCallback.get());
+    if(_resultGroupUpdateCallback.valid())
+        conf.setNonSerializable("result_callback",_resultGroupUpdateCallback.get());
     return conf;
 }
 
 
 //-----------------------------------------------------------------------
+
+namespace osgEarth { namespace Features{
+class SetDrawableCallbackVisitor : public osg::NodeVisitor
+{
+public:
+    SetDrawableCallbackVisitor(osg::Callback * callback):
+        osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN),
+        _callback(callback)
+    {
+
+    }
+
+    void apply(osg::Drawable& drawable)
+    {
+        drawable.setCullCallback(_callback);
+    }
+
+private:
+    osg::ref_ptr<osg::Callback> _callback;
+};
+}}
 
 GeometryCompiler::GeometryCompiler()
 {
@@ -591,6 +618,17 @@ GeometryCompiler::compile(FeatureList&          workingSet,
         osgEarth::GeometryValidator validator;
         resultGroup->accept(validator);
         OE_NOTICE << LC << "-- End Debugging --\n";
+    }
+
+    if(_options.drawableCallback().valid())
+    {
+        SetDrawableCallbackVisitor setcallBackVisitor(_options.drawableCallback().get());
+        resultGroup->accept(setcallBackVisitor);
+    }
+
+    if(_options.resultGroupUpdateCallback().valid())
+    {
+        resultGroup->setUpdateCallback(_options.resultGroupUpdateCallback().get());
     }
 
     return resultGroup.release();

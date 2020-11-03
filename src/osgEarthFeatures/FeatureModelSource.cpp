@@ -136,6 +136,7 @@ FeatureModelSourceOptions::fromConfig( const Config& conf )
     conf.get( "node_caching",     _nodeCaching );
     
     conf.get( "session_wide_resource_cache", _sessionWideResourceCache );
+    _featureTileUpdateCallback = conf.getNonSerializable<osg::Callback>("feature_tile_callback");
 }
 
 Config
@@ -164,6 +165,9 @@ FeatureModelSourceOptions::getConfig() const
     conf.set( "node_caching",     _nodeCaching );
     
     conf.set( "session_wide_resource_cache", _sessionWideResourceCache );
+
+    if(_featureTileUpdateCallback.valid())
+        conf.setNonSerializable("feature_tile_callback",_featureTileUpdateCallback.get());
 
     return conf;
 }

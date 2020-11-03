@@ -37,7 +37,10 @@ FeatureProfile::FeatureProfile( const GeoExtent& extent ) :
 _extent    ( extent ),
 _firstLevel( 0 ),
 _maxLevel  ( -1 ),
-_tiled     ( false )
+_tiled     ( false ),
+_invertedTileY(true),
+_isSetValidExtent(false),
+_globalGeodeticForWy(false)
 {
     //nop
 }
@@ -751,4 +754,16 @@ void Feature::splitAcrossDateLine(FeatureList& splitFeatures)
     {
         splitFeatures.push_back( this );
     }   
+}
+
+void FeatureProfile::setValidExtent(const GeoExtent &validExtent)
+{
+    _isSetValidExtent = true;
+    _validExtent = validExtent;
+}
+
+void FeatureProfile::getValidExtent(bool &isSetValidExtent, GeoExtent &validExtent)
+{
+    isSetValidExtent = _isSetValidExtent;
+    validExtent = _validExtent;
 }

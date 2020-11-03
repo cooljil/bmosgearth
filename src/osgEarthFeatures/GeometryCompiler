@@ -116,6 +116,11 @@ namespace osgEarth { namespace Features
         optional<bool>& useOSGTessellator() { return _useOSGTessellator; }
         const optional<bool>& useOSGTessellator() const { return _useOSGTessellator; }
 
+        osg::ref_ptr<osg::Callback>& drawableCallback() { return _drawableCallback; }
+        const osg::ref_ptr<osg::Callback>& drawableCallback() const { return _drawableCallback; }
+
+        osg::ref_ptr<osg::Callback>& resultGroupUpdateCallback() { return _resultGroupUpdateCallback; }
+        const osg::ref_ptr<osg::Callback>& resultGroupUpdateCallback() const { return _resultGroupUpdateCallback; }
     public:
         Config getConfig() const;
 
@@ -140,6 +145,8 @@ namespace osgEarth { namespace Features
         optional<float>                _maxPolyTilingAngle;
         optional<bool>                 _useGPULines;
         optional<bool>                 _useOSGTessellator;
+        osg::ref_ptr<osg::Callback>    _drawableCallback;
+        osg::ref_ptr<osg::Callback>    _resultGroupUpdateCallback;
 
         static GeometryCompilerOptions s_defaults;
 

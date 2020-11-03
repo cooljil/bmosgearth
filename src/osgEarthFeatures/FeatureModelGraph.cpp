@@ -743,38 +743,81 @@ FeatureModelGraph::setupPaging()
         }
     }
 
-    // calculate the max range for the top-level PLOD:
-    // TODO: a user-specified maxRange is actually an altitude, so this is not
-    //       strictly correct anymore!
-    float maxRange = 
-        maxRangeOverride.isSet() ? *maxRangeOverride :
-        bs.radius() * _options.layout()->tileSizeFactor().value();
+    /*****wy modified on 2018-5-22*****/
 
-    // build the URI for the top-level paged LOD:
-    std::string uri = s_makeURI( 0, 0, 0 );
-
-    // bulid the top level node:
-    osg::Node* topNode;
-
-    if (options().layout()->paged() == true)
+    if(featureProfile->isGlobalGeodeticForWy())
     {
-        topNode = createPagedNode( 
-            bs, 
-            uri, 
-            0.0f, 
-            maxRange, 
-            _options.layout().get(),
-            _sgCallbacks.get(),
-            _defaultFileLocationCallback.get(),
-            getSession()->getDBOptions(),
-            this);
+        GeoExtent leftExtent(_usableMapExtent.getSRS(),-180,-90,0,90);
+        GeoExtent rightExtent(_usableMapExtent.getSRS(),0,-90,180,90);
+        osg::BoundingSphered bsLeft = getBoundInWorldCoords(leftExtent);
+        osg::BoundingSphered bsRight = getBoundInWorldCoords(rightExtent);
+        float maxRangLeft = maxRangeOverride.isSet() ? *maxRangeOverride : bsLeft.radius() * _options.layout()->tileSizeFactor().value();
+        float maxRangRight = maxRangeOverride.isSet() ? *maxRangeOverride : bsRight.radius() * _options.layout()->tileSizeFactor().value();
+        std::string uriLeft = s_makeURI( 0, 0, 0 );
+        std::string uriRight = s_makeURI( 0, 1, 0 );
+        osg::Group* pagedNodeLeft = createPagedNode(
+                    bsLeft,
+                    uriLeft,
+                    0.0f,
+                    maxRangLeft,
+                    _options.layout().get(),
+                    _sgCallbacks.get(),
+                    _defaultFileLocationCallback.get(),
+                    getSession()->getDBOptions() ,
+                    this);
+
+        osg::Group* pagedNodeRight = createPagedNode(
+                    bsRight,
+                    uriRight,
+                    0.0f,
+                    maxRangRight,
+                    _options.layout().get(),
+                    _sgCallbacks.get(),
+                    _defaultFileLocationCallback.get(),
+                    getSession()->getDBOptions() ,
+                    this);
+
+        osg::Group * pagedNode = new osg::Group();
+        pagedNode->addChild(pagedNodeLeft);
+        pagedNode->addChild(pagedNodeRight);
+        return pagedNode;
     }
     else
     {
-        topNode = load(0, 0, 0, uri, getSession()->getDBOptions());
-    }
 
-    return topNode;
+        // calculate the max range for the top-level PLOD:
+        // TODO: a user-specified maxRange is actually an altitude, so this is not
+        //       strictly correct anymore!
+        float maxRange =
+                maxRangeOverride.isSet() ? *maxRangeOverride :
+                                           bs.radius() * _options.layout()->tileSizeFactor().value();
+
+        // build the URI for the top-level paged LOD:
+        std::string uri = s_makeURI( 0, 0, 0 );
+
+        // bulid the top level node:
+        osg::Node* topNode;
+
+        if (options().layout()->paged() == true)
+        {
+            topNode = createPagedNode(
+                        bs,
+                        uri,
+                        0.0f,
+                        maxRange,
+                        _options.layout().get(),
+                        _sgCallbacks.get(),
+                        _defaultFileLocationCallback.get(),
+                        getSession()->getDBOptions(),
+                        this);
+        }
+        else
+        {
+            topNode = load(0, 0, 0, uri, getSession()->getDBOptions());
+        }
+
+        return topNode;
+    }
 }
 
 
@@ -801,7 +844,17 @@ FeatureModelGraph::load(unsigned lod, unsigned tileX, unsigned tileY,
         if ( (int)lod >= featureProfile->getFirstLevel() )
         {
             // The extent of this tile:
-            GeoExtent tileExtent = s_getTileExtent( lod, tileX, tileY, _usableFeatureExtent );
+            GeoExtent tileExtent;
+            /*****wy************/
+            bool isGlobalGeodeticForWy = featureProfile->isGlobalGeodeticForWy();
+            if(isGlobalGeodeticForWy)
+            {
+                osgEarth::Profile * prof = const_cast<osgEarth::Profile *>(featureProfile->getProfile());
+                tileExtent = prof->calculateExtent(lod,tileX,tileY);
+
+            }
+            else
+                tileExtent = s_getTileExtent( lod, tileX, tileY, _usableFeatureExtent );
 
             // Calculate the bounds of this new tile:
             osg::BoundingSphered tileBound = getBoundInWorldCoords( tileExtent );
@@ -816,14 +869,18 @@ FeatureModelGraph::load(unsigned lod, unsigned tileX, unsigned tileY,
             //OE_NOTICE << "  tileFactor = " << tileFactor << " maxRange=" << maxRange << " radius=" << tileBound.radius() << std::endl;
             
 
-            // Construct a tile key that will be used to query the source for this tile.            
-            // The tilekey x, y, z that is computed in the FeatureModelGraph uses a lower left origin,
-            // osgEarth tilekeys use a lower left so we need to invert it.
-            unsigned int w, h;
-            featureProfile->getProfile()->getNumTiles(lod, w, h);
-            int invertedTileY = h - tileY - 1;
+            unsigned int tmpTileY = tileY;
+            if(featureProfile->getInvertedTileY())
+            {
+                // Construct a tile key that will be used to query the source for this tile.
+                // The tilekey x, y, z that is computed in the FeatureModelGraph uses a lower left origin,
+                // osgEarth tilekeys use a lower left so we need to invert it.
+                unsigned int w, h;
+                featureProfile->getProfile()->getNumTiles(lod, w, h);
+                tmpTileY = h - tileY - 1;
+            }
 
-            TileKey key(lod, tileX, invertedTileY, featureProfile->getProfile());
+            TileKey key(lod, tileX, tmpTileY, featureProfile->getProfile());
 
             geometry = buildTile( level, tileExtent, &key, readOptions );
             result = geometry;
@@ -953,12 +1010,41 @@ FeatureModelGraph::buildSubTilePagedLODs(unsigned        parentLOD,
         return;
     }
     
+    /*****wy************/
+    bool isGlobalGeodeticForWy = false;
+    FeatureSource* featureSource = _session->getFeatureSource();
+    osgEarth::Profile * prof = 0;
+    bool isSetValidExtent = false;
+    GeoExtent validExtent;
+    if (featureSource)
+    {
+        FeatureProfile* fp = const_cast<FeatureProfile *>(featureSource->getFeatureProfile());
+        isGlobalGeodeticForWy = fp->isGlobalGeodeticForWy();
+        fp->getValidExtent(isSetValidExtent,validExtent);
+        if(isGlobalGeodeticForWy)
+            prof = const_cast<osgEarth::Profile *>(fp->getProfile());
+    }
+    /***************/
+
     // make a paged LOD for each subtile:
     for( unsigned u = subtileX; u <= subtileX + 1; ++u )
     {
         for( unsigned v = subtileY; v <= subtileY + 1; ++v )
         {
-            GeoExtent subtileFeatureExtent = s_getTileExtent( subtileLOD, u, v, _usableFeatureExtent );
+            GeoExtent subtileFeatureExtent;
+            if(prof)
+            {
+                subtileFeatureExtent = prof->calculateExtent(subtileLOD,u,v);
+                if(isSetValidExtent)
+                {
+                    if(!validExtent.intersects(subtileFeatureExtent,false))
+                        continue;
+                }
+            }
+            else
+            {
+                subtileFeatureExtent = s_getTileExtent( subtileLOD, u, v, _usableFeatureExtent );
+            }
             osg::BoundingSphered subtile_bs = getBoundInWorldCoords( subtileFeatureExtent );
       
             // Calculate the maximum camera range for the LOD.
@@ -1280,6 +1366,12 @@ FeatureModelGraph::buildTile(const FeatureLevel& level,
                         group->addCullCallback( ccc );
                 }
             }
+        }
+
+
+        if(_options.featureTileUpdateCallback().valid())
+        {
+            group->setUpdateCallback(_options.featureTileUpdateCallback().get());
         }
 
         return group.release();
